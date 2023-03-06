@@ -9,7 +9,6 @@ namespace TatBlog.WinApp
     {
         static void Main(string[] args)
         {
-            // Tạo đối tượng context để quản lý phiên làm việc
             var context = new BlogDbContext();
 
             // InitDB(context);
@@ -20,23 +19,18 @@ namespace TatBlog.WinApp
             // XuatDanhSachDanhMuc(context);
             // XuatDanhSachTheTheoPhanTrang(context);
             // TimTagTheoSlug(context, "tag-19");
-            Console.ReadKey();
+             Console.ReadKey();
         }
 
         static void InitDB(BlogDbContext context)
         {
-            // Tạo đối tượng khởi tạo dữ liệu mẫu
             var seeder = new DataSeeder(context);
-            // Gọi hàm nhập dữ liệu mẫu
             seeder.Initialize();
         }
 
         static void XuatDanhSachTacGia(BlogDbContext context)
         {
-            // Đọc danh sách tác giả từ CSDL
             var authors = context.Author.ToList();
-
-            // Xuất danh sách tác giả ra màn hình
             Console.WriteLine("{0,-4}{1,-30}{2,-30}{3,12}", "ID", "Full Name", "Email", "Joined Date");
             foreach (var author in authors)
             {
@@ -72,7 +66,6 @@ namespace TatBlog.WinApp
        
         static async void XuatDanhSachDanhMuc(BlogDbContext context)
         {
-            // Tạo đối tượng BlogRepository
             IBlogRepository blogRepo = new BlogRepository(context);
 
             var categories = await blogRepo.GetCategoryItemsAsync();
@@ -87,10 +80,8 @@ namespace TatBlog.WinApp
 
         static async void XuatDanhSachTheTheoPhanTrang(BlogDbContext context)
         {
-            // Tạo đối tượng BlogRepository
             IBlogRepository blogRepo = new BlogRepository(context);
 
-            // Tạo đối tượng chứa tham số phân trang
             var pagingParams = new PagingParams()
             {
                 PageNumber = 1,
@@ -99,10 +90,8 @@ namespace TatBlog.WinApp
                 SortOrder = "DESC"
             };
 
-            // Lấy danh sách từ khóa
             var tagsList = await blogRepo.GetPagedTagAsync(pagingParams);
 
-            // Xuất ra màn hình
             Console.WriteLine("{0,-5}{1,-50}{2,10}", "ID", "Name", "Count");
 
             foreach (var tag in tagsList)
@@ -111,6 +100,17 @@ namespace TatBlog.WinApp
             }
         }
 
-       
+        static async void TimTagTheoSlug(BlogDbContext context, string slug)
+        {
+            IBlogRepository blogRepo = new BlogRepository(context);
+
+            Tag tag = await blogRepo.GetTagBySlugAsync(slug);
+
+            Console.WriteLine("{0,-5}{1,-50}{2,10}", "ID", "Name", "Count");
+            if (tag != null)
+            {
+                Console.WriteLine("{0,-5}{1,-50}{2,10}", tag.Id, tag.Name, tag.Posts.Count);
+            }
+        }
     }
 }
