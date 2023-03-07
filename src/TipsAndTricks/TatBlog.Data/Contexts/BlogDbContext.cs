@@ -18,7 +18,7 @@ namespace TatBlog.Data.Contexts
         public DbSet<Tag> Tags { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@"Server=.;Database=Tatblog;Trusted_Connection=True;MultipleActiveResultSets=True;Encrypt=False");
+            optionsBuilder.UseSqlServer(@"Server=NGOCANH\NGOCANH;Database=Tatblog;Trusted_Connection=True;MultipleActiveResultSets=True;Encrypt=False");
 
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
