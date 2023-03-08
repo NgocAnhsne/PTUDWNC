@@ -16,5 +16,7 @@ namespace TatBlog.Services.Blogs
         public int Day { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public string KeyWord { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
         public bool PublishedOnly { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string AuthorSlug { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string TagSlug { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     }
 }

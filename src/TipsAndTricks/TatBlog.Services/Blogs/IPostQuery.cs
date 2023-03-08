@@ -12,6 +12,8 @@ namespace TatBlog.Services.Blogs
         public int AuthorId { get; set; }
         // tên ký hiệu chuyên mục
         public string CategorySlug { get; set; }
+        public string AuthorSlug { get; set; }
+        public string TagSlug { get; set; }
         public int Year { get; set; }
         public int Month { get; set; }
         public int Day { get; set; }
