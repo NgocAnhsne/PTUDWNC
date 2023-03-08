@@ -9,7 +9,7 @@ namespace TatBlog.WinApp
     {
         static void Main(string[] args)
         {
-            var context = new BlogDbContext();
+            //var context = new BlogDbContext();
 
             // InitDB(context);
 
