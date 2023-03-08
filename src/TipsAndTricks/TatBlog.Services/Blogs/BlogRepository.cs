@@ -121,5 +121,62 @@ namespace TatBlog.Services.Blogs
 
             return await tagQuery.FirstOrDefaultAsync(cancellationToken);
         }
+        public IQueryable<Post> FilterPosts(PostQuery postQuery)
+        {
+            IQueryable<Post> posts = _context.Set<Post>()
+                .Include(x => x.Category)
+                .Include(x => x.Author);
+
+            if (postQuery.CategoryId > 0)
+            {
+                posts = posts.Where(x => x.CategoryId == postQuery.CategoryId);
+            }
+
+            if (!string.IsNullOrWhiteSpace(postQuery.CategorySlug))
+            {
+                posts = posts.Where(x => x.Category.UrlSlug == postQuery.CategorySlug);
+            }
+
+            if (postQuery.AuthorId > 0)
+            {
+                posts = posts.Where(x => x.AuthorId == postQuery.AuthorId);
+            }
+
+            if (!string.IsNullOrWhiteSpace(postQuery.KeyWord))
+            {
+                posts = posts.Where(x => x.Title.Contains(postQuery.KeyWord) ||
+                                         x.ShortDescription.Contains(postQuery.KeyWord) ||
+                                         x.Description.Contains(postQuery.KeyWord) ||
+                                         x.Category.Name.Contains(postQuery.KeyWord) ||
+                                         x.Tags.Any(t => t.Name.Contains(postQuery.KeyWord)));
+            }
+
+            if (postQuery.Year > 0)
+            {
+                posts = posts.Where(x => x.PostedDate.Year == postQuery.Year);
+            }
+
+            if (postQuery.Month > 0)
+            {
+                posts = posts.Where(x => x.PostedDate.Month == postQuery.Month);
+            }
+            if (postQuery.PublishedOnly)
+            {
+                posts = posts.Where(x => x.Published);
+            }
+            return posts;
+        }
+
+        public async Task<IPagedList<Post>> GetPagedPostsAsync(
+        PostQuery postQuery,
+        int pageNumber = 1,
+        int pageSize = 10,
+        CancellationToken cancellationToken = default)
+        {
+            return await FilterPosts(postQuery).ToPagedListAsync(
+                pageNumber, pageSize,
+                nameof(Post.PostedDate), "DESC",
+                cancellationToken);
+        }
     }
 }

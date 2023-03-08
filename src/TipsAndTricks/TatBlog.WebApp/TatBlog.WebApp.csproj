@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="wwwroot\images\đa\**" />
+    <Content Remove="wwwroot\images\đa\**" />
+    <EmbeddedResource Remove="wwwroot\images\đa\**" />
+    <None Remove="wwwroot\images\đa\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="wwwroot\css\main.css" />
     <Content Remove="wwwroot\js\main.js" />
   </ItemGroup>
@@ -20,7 +27,6 @@
   <ItemGroup>
     <Folder Include="Models\" />
     <Folder Include="wwwroot\fonts\" />
-    <Folder Include="wwwroot\images\" />
     <Folder Include="wwwroot\lib\" />
     <Folder Include="wwwroot\templates\emails\" />
     <Folder Include="wwwroot\uploads\pictures\" />

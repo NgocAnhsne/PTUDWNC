@@ -1,6 +1,15 @@
-﻿@{
+﻿@model IPagedList<Post>
+
+@{
     ViewData["PageTitle"] = "Trang chủ";
 }
+
+<div class="p-4">
+    @foreach (var postItem in Model)
+    {
+        <partial name="_PostItem" model="postItem">
+    }
+</div>
 
 <h1>
     Đây là trang chủ
