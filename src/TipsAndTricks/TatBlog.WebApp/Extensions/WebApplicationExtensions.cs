@@ -7,7 +7,7 @@ namespace TatBlog.WebApp.Extensions
 {
     public static class WebApplicationExtensions
     {
-        static WebApplicationBuilder ConfigureMvc(
+       public static WebApplicationBuilder ConfigureMvc(
             this WebApplicationBuilder builder)
         {
             builder.Services.AddControllersWithViews();
@@ -15,8 +15,8 @@ namespace TatBlog.WebApp.Extensions
 
             return builder;
         }
-        static WebApplicationBuilder ConfigureServices(
-            WebApplicationBuilder builder)
+        public static WebApplicationBuilder ConfigureServices(
+            this WebApplicationBuilder builder)
         {
             builder.Services.AddDbContext<BlogDbContext>(options =>
             options.UseSqlServer(
@@ -27,7 +27,7 @@ namespace TatBlog.WebApp.Extensions
 
             return builder;
         }
-        static WebApplication UseRequestPipeline(this WebApplication app)
+        public static WebApplication UseRequestPipeline(this WebApplication app)
         {
             if (app.Environment.IsDevelopment())
             {
@@ -51,7 +51,7 @@ namespace TatBlog.WebApp.Extensions
             return app;
 
         }
-        static IApplicationBuilder UseDataSeeder(
+        public static IApplicationBuilder UseDataSeeder(
             this IApplicationBuilder app)
         {
             using var scope = app.ApplicationServices.CreateScope();

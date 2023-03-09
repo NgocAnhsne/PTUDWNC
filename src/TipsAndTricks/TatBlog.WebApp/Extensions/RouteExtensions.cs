@@ -3,7 +3,7 @@
     public static class RouteExtensions
     {
 
-        static IEndpointRouteBuilder UseBlogRoutes(
+        public static IEndpointRouteBuilder UseBlogRoutes(
             this IEndpointRouteBuilder endpoints)
         {
             endpoints.MapControllerRoute(
