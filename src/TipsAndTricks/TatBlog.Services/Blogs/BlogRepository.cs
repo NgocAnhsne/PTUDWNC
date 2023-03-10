@@ -177,6 +177,10 @@ namespace TatBlog.Services.Blogs
             {
                 posts = posts.Where(x => x.Category.UrlSlug == postQuery.CategorySlug);
             }
+            if (!string.IsNullOrWhiteSpace(postQuery.CategoryName))
+            {
+                posts = posts.Where(x => x.Category.Name == postQuery.CategoryName);
+            }
             return posts;
         }
 
