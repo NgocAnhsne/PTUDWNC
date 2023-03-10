@@ -5,7 +5,7 @@ using TatBlog.Services.Blogs;
 
 namespace TatBlog.WebApp.Components
 {
-    public class CategoriesWidget
+    public class CategoriesWidget:ViewComponent
     {
         private readonly IBlogRepository _blogRepository;
         public CategoriesWidget(IBlogRepository blogRepository)
@@ -16,11 +16,6 @@ namespace TatBlog.WebApp.Components
         {
             var categories = await _blogRepository.GetCategoryItemsAsync();
             return View(categories);
-        }
-
-        private IViewComponentResult View(IList<CategoryItem> categories)
-        {
-            throw new NotImplementedException();
         }
     }
 }

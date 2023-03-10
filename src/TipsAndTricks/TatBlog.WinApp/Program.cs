@@ -9,7 +9,7 @@ namespace TatBlog.WinApp
     {
         static void Main(string[] args)
         {
-            //var context = new BlogDbContext();
+            // var context = new BlogDbContext();
 
             // InitDB(context);
 
@@ -19,13 +19,14 @@ namespace TatBlog.WinApp
             // XuatDanhSachDanhMuc(context);
             // XuatDanhSachTheTheoPhanTrang(context);
             // TimTagTheoSlug(context, "tag-19");
-             Console.ReadKey();
+            Console.ReadKey();
         }
 
         static void InitDB(BlogDbContext context)
         {
             var seeder = new DataSeeder(context);
             seeder.Initialize();
+            Console.WriteLine("Success!");
         }
 
         static void XuatDanhSachTacGia(BlogDbContext context)
