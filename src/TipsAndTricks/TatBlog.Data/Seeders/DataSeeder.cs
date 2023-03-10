@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TatBlog.Data.Contexts;
 using TatBlog.Core.Entities;
+using System.Dynamic;
 
 namespace TatBlog.Data.Seeders
 {
@@ -14,7 +15,7 @@ namespace TatBlog.Data.Seeders
         public DataSeeder(BlogDbContext dbContext)
         {
             _dbContext = dbContext;
-        }
+        } 
         public void Initialize()
         {
             _dbContext.Database.EnsureCreated();

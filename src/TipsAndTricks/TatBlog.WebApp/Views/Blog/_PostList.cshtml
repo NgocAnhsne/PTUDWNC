@@ -14,13 +14,14 @@
             </div>
             <div class="col-md-8">
                 <div class="card-body">
-                    <a asp-controller="Blog" 
+                    <a class="card-title"
+                        asp-controller="Blog" 
                         asp-action="Post" 
                         asp-route-year="@Model.PostedDate.Year"
                         asp-route-month="@Model.PostedDate.Month"
                         asp-route-day="@Model.PostedDate.Day"
                         asp-route-slug="@Model.UrlSlug" 
-                        class="card-title">
+                        >
                         @Model.Title
                     </a>
                     <p class="card-text">
