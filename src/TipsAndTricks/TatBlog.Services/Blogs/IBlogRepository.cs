@@ -31,6 +31,8 @@ namespace TatBlog.Services.Blogs
         Task<IList<CategoryItem>> GetCategoryItemsAsync(
             bool showOnMenu = false,
             CancellationToken cancellationToken =default);
+        Task<IList<AuthorItem>> GetAuthorItemsAsync(
+            CancellationToken cancellationToken = default);
         Task<IPagedList<TagItem>> GetPagedTagAsync(
             IPagingParams pagingParams,
             CancellationToken cancellationToken = default);
