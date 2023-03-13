@@ -24,8 +24,12 @@
             endpoints.MapControllerRoute(
                 name: "posts-by-author",
                 pattern: "blog/author/{slug}",
-                defaults: new { controller = "Blog", action = "Author" }
-            );
+                defaults: new { controller = "Blog", action = "Author" });
+
+            endpoints.MapControllerRoute(
+                name: "admin-area",
+                pattern: "admin/{controller=Dashboard}/{action=Index}/{is?}",
+                defaults: new { area = "Admin"});
 
             endpoints.MapControllerRoute(
                 name: "default",
