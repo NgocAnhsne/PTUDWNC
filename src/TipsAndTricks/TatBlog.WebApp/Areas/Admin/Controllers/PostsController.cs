@@ -5,7 +5,7 @@ using TatBlog.WebApp.Areas.Admin.Models;
 
 namespace TatBlog.WebApp.Areas.Admin.Controllers
 {
-    public class PostsController
+    public class PostsController:Controller
     {
         private readonly IBlogRepository _blogRepository;
 
