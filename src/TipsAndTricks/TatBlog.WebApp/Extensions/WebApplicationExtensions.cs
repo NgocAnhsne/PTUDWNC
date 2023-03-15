@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NLog.Web;
 using TatBlog.Data.Contexts;
 using TatBlog.Data.Seeders;
 using TatBlog.Services.Blogs;
+using TatBlog.Services.Media;
 
 namespace TatBlog.WebApp.Extensions
 {
@@ -15,6 +17,15 @@ namespace TatBlog.WebApp.Extensions
 
             return builder;
         }
+
+        public static WebApplicationBuilder ConfigureNLog(
+            this WebApplicationBuilder builder)
+        {
+            builder.Logging.ClearProviders();
+            builder.Host.UseNLog();
+
+            return builder;
+        }
         public static WebApplicationBuilder ConfigureServices(
             this WebApplicationBuilder builder)
         {
@@ -22,6 +33,7 @@ namespace TatBlog.WebApp.Extensions
             options.UseSqlServer(
                 builder.Configuration
                     .GetConnectionString("DefaultConnection")));
+            builder.Services.AddScoped<IMediaManager, LocalFileSystemMediaManager>();
             builder.Services.AddScoped<IBlogRepository, BlogRepository>();
             builder.Services.AddScoped<IDataSeeder, DataSeeder>();
 
