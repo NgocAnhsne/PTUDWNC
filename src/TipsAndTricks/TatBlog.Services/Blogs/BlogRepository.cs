@@ -45,16 +45,19 @@ namespace TatBlog.Services.Blogs
             return await postsQuery.FirstOrDefaultAsync(cancellationToken);
         }
         public async Task<Post> GetPostByIdAsync(
-            int postId,
-            CancellationToken cancellationToken = default)
+        int postId, bool includeDetails = false,
+        CancellationToken cancellationToken = default)
         {
-            IQueryable<Post> postsQuery = _context.Set<Post>();
-            if(postId > 0)
+            if (!includeDetails)
             {
-                postsQuery = postsQuery.Where(x=>x.Id == postId);
+                return await _context.Set<Post>().FindAsync(postId);
             }
-            return await postsQuery.FirstOrDefaultAsync(cancellationToken);
 
+            return await _context.Set<Post>()
+                .Include(x => x.Category)
+                .Include(x => x.Author)
+                .Include(x => x.Tags)
+                .FirstOrDefaultAsync(x => x.Id == postId, cancellationToken);
         }
         public async Task<Tag> GetTagAsync(
         string slug, CancellationToken cancellationToken = default)

@@ -18,8 +18,8 @@ namespace TatBlog.Services.Blogs
             string slug,
             CancellationToken cancellationToken = default);
         Task<Post> GetPostByIdAsync(
-            int postId,
-            CancellationToken cancellationToken = default);
+        int postId, bool includeDetails = false,
+        CancellationToken cancellationToken = default);
         Task<Tag> GetTagAsync(
         string slug, CancellationToken cancellationToken = default);
         Task<IList<Post>> GetPopularArticlesAsync(
