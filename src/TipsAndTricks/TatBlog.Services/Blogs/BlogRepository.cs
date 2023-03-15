@@ -43,7 +43,18 @@ namespace TatBlog.Services.Blogs
             }
             return await postsQuery.FirstOrDefaultAsync(cancellationToken);
         }
+        public async Task<Post> GetPostByIdAsync(
+            int postId,
+            CancellationToken cancellationToken = default)
+        {
+            IQueryable<Post> postsQuery = _context.Set<Post>();
+            if(postId > 0)
+            {
+                postsQuery = postsQuery.Where(x=>x.Id == postId);
+            }
+            return await postsQuery.FirstOrDefaultAsync(cancellationToken);
 
+        }
         public async Task<IList<Post>> GetPopularArticlesAsync(
             int numPost,
             CancellationToken cancellationToken = default)
@@ -227,5 +238,6 @@ namespace TatBlog.Services.Blogs
                 nameof(Post.PostedDate), "DESC",
                 cancellationToken);
         }
+        
     }
 }

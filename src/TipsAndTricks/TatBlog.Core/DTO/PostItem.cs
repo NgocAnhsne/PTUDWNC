@@ -23,7 +23,7 @@ namespace TatBlog.Core.DTO
         public int CategoryId { get; set; }
         public int AuthorId { get; set; }
         public string CategoryName { get; set; }
-        public Author Author { get; set; }
-        public IList<Tag> Tags { get; set; }
+        public string AuthorName { get; set; }
+        public IList<String> Tags { get; set; }
     }
 }
