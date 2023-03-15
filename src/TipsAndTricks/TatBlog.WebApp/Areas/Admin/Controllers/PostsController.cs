@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using TatBlog.Core.Entities;
 using TatBlog.Services.Blogs;
+using TatBlog.Services.Media;
 using TatBlog.WebApp.Areas.Admin.Models;
 
 namespace TatBlog.WebApp.Areas.Admin.Controllers
@@ -10,11 +11,15 @@ namespace TatBlog.WebApp.Areas.Admin.Controllers
     public class PostsController : Controller
     {
         private readonly IBlogRepository _blogRepository;
+        private readonly IMediaManager _mediaManager;
         private readonly IMapper _mapper;
 
-        public PostsController(IBlogRepository blogRepository, IMapper mapper)
+        public PostsController(IBlogRepository blogRepository,
+            IMediaManager mediaManager,
+            IMapper mapper)
         {
             _blogRepository = blogRepository;
+            _mediaManager = mediaManager;
             _mapper = mapper;
         }
         private async Task PopulatePostFilterModelAsync(PostFilterModel model)
@@ -85,6 +90,21 @@ namespace TatBlog.WebApp.Areas.Admin.Controllers
                 post.Category = null;
                 post.ModifiedDate = DateTime.Now;
             }
+            //neu nguoi dung upload hinh anh minh hoa cho bai viet
+            if(model.ImageFile?.Length > 0)
+            {
+                //thi thuc hien viec luu tap tin vao thu muc uploads
+                var newImagePath = await _mediaManager.SaveFileAsync(
+                    model.ImageFile.OpenReadStream(),
+                    model.ImageFile.FileName,
+                    model.ImageFile.ContentType);
+                //neu luu thanh cong, xoa tap tin hinh anh cu(neu co)
+                if (!string.IsNullOrWhiteSpace(newImagePath))
+                {
+                    await _mediaManager.DeleteFileAsync(post.ImageUrl);
+                    post.ImageUrl = newImagePath;
+                }
+            }
 
             await _blogRepository.CreateOrUpdatePostAsync(post, model.GetSelectedTags());
             return RedirectToAction(nameof(Index));
@@ -97,5 +117,6 @@ namespace TatBlog.WebApp.Areas.Admin.Controllers
                 ? Json($"Slug '{urlSlug}' đã được sử dụng")
                 : Json(true);
         }
+
     }
 }
