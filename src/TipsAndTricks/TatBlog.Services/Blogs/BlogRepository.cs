@@ -9,6 +9,7 @@ using TatBlog.Core.DTO;
 using TatBlog.Data.Contexts;
 using TatBlog.Core.Constracts;
 using TatBlog.Services.Extentions;
+using TatBlog.Services.Extensions;
 
 namespace TatBlog.Services.Blogs
 {
@@ -54,6 +55,12 @@ namespace TatBlog.Services.Blogs
             }
             return await postsQuery.FirstOrDefaultAsync(cancellationToken);
 
+        }
+        public async Task<Tag> GetTagAsync(
+        string slug, CancellationToken cancellationToken = default)
+        {
+            return await _context.Set<Tag>()
+                .FirstOrDefaultAsync(x => x.UrlSlug == slug, cancellationToken);
         }
         public async Task<IList<Post>> GetPopularArticlesAsync(
             int numPost,
@@ -238,6 +245,51 @@ namespace TatBlog.Services.Blogs
                 nameof(Post.PostedDate), "DESC",
                 cancellationToken);
         }
-        
+        public async Task<Post> CreateOrUpdatePostAsync(
+        Post post, IEnumerable<string> tags,
+        CancellationToken cancellationToken = default)
+        {
+            if (post.Id > 0)
+            {
+                await _context.Entry(post).Collection(x => x.Tags).LoadAsync(cancellationToken);
+            }
+            else
+            {
+                post.Tags = new List<Tag>();
+            }
+            var validTags = tags.Where(x => !string.IsNullOrWhiteSpace(x))
+                .Select(x => new
+                {
+                    Name = x,
+                    Slug = x.GenerateSlug()
+                })
+                .GroupBy(x => x.Slug)
+                .ToDictionary(g => g.Key, g => g.First().Name);
+            foreach (var k in validTags)
+            {
+                if (post.Tags.Any(x => string.Compare(x.UrlSlug, k.Key, StringComparison.InvariantCultureIgnoreCase) == 0)) continue;
+
+                var tag = await GetTagAsync(k.Key, cancellationToken) ?? new Tag()
+                {
+                    Name = k.Value,
+                    Description = k.Value,
+                    UrlSlug = k.Key
+                };
+
+                post.Tags.Add(tag);
+            }
+
+            post.Tags = post.Tags.Where(t => validTags.ContainsKey(t.UrlSlug)).ToList();
+
+            if (post.Id > 0)
+                _context.Update(post);
+            else
+                _context.Add(post);
+
+            await _context.SaveChangesAsync(cancellationToken);
+
+            return post;
+        }
+
     }
 }

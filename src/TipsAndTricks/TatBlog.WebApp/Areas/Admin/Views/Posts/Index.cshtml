@@ -9,7 +9,8 @@
 <h1>
     Danh sách bài viết
 </h1>
-<partial name="_PostFilterPan" model="Model" />
+
+<partial name="_PostFilterPane" model="Model" />
 @if (postsList != null && postsList.Count > 0)
 {
     <table class="table table-responsive table-striped">
@@ -50,7 +51,7 @@
             }
         </tbody>
     </table>
-}
+} else
 {
 <h1 class="text-danger">
     Không tìm thấy bài viết nào
