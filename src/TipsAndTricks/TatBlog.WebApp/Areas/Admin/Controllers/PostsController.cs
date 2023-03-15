@@ -32,6 +32,22 @@ namespace TatBlog.WebApp.Areas.Admin.Controllers
                 Value = c.Id.ToString() 
             });
         }
+        private async Task PopulatePostEditModelAsync(PostEditModel model)
+        {
+            var authors = await _blogRepository.GetAuthorItemsAsync();
+            var categories = await _blogRepository.GetCategoryItemsAsync();
+
+            model.AuthorList = authors.Select(a => new SelectListItem()
+            {
+                Text = a.FullName,
+                Value = a.Id.ToString()
+            });
+            model.CategoryList = categories.Select(c => new SelectListItem()
+            {
+                Text = c.Name,
+                Value = c.Id.ToString()
+            });
+        }
         public async Task<IActionResult> Index(PostFilterModel model)
         {
             var postQuery = _mapper.Map<PostQuery>(model);
@@ -42,6 +58,18 @@ namespace TatBlog.WebApp.Areas.Admin.Controllers
             await PopulatePostFilterModelAsync(model);
 
             return View(model);
+        }
+        [HttpPost]
+        public async Task<IActionResult> Edit(PostEditModel model)
+        {
+            if (!ModelState.IsValid) 
+            {
+                await PopulatePostEditModelAsync(model);
+                return View(model);
+            }
+            var post = model.Id > 0
+                ? await _blogRepository.GetPostByIdAsync(model.Id)
+                : null;
         }
     }
 }
