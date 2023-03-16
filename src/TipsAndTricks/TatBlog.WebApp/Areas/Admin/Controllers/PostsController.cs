@@ -67,6 +67,20 @@ namespace TatBlog.WebApp.Areas.Admin.Controllers
 
             return View(model);
         }
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id = 0)
+        {
+            var post = id > 0
+                ? await _blogRepository.GetPostByIdAsync(id, true)
+                : null;
+
+            var model = post == null?new PostEditModel()
+                :_mapper.Map<PostEditModel>(post);
+
+            await PopulatePostEditModelAsync(model);
+            return View(model);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Edit(
             IValidator<PostEditModel> postValidator,
@@ -126,6 +140,19 @@ namespace TatBlog.WebApp.Areas.Admin.Controllers
                 ? Json($"Slug '{urlSlug}' đã được sử dụng")
                 : Json(true);
         }
-
+        public async Task<IActionResult> Index(
+            [FromQuery(Name = "k")] string keyword = "",
+            [FromQuery(Name = "p")] int pageNumber = 1,
+            [FromQuery(Name = "ps")] int pageSize = 10)
+        {
+            var postQuery = new PostQuery()
+            {
+                PublishedOnly = true,
+                KeyWord = keyword
+            };
+            var postsList = await _blogRepository.GetPagedPostsAsync(postQuery, pageNumber, pageSize);
+            ViewBag.PostQuery = postQuery;
+            return View(postsList);
+        }
     }
 }
