@@ -12,14 +12,17 @@ namespace TatBlog.WebApp.Areas.Admin.Controllers
 {
     public class PostsController : Controller
     {
+        private readonly ILogger<PostsController> _logger;
         private readonly IBlogRepository _blogRepository;
         private readonly IMediaManager _mediaManager;
         private readonly IMapper _mapper;
 
-        public PostsController(IBlogRepository blogRepository,
+        public PostsController(ILogger<PostsController> logger, 
+            IBlogRepository blogRepository,
             IMediaManager mediaManager,
             IMapper mapper)
         {
+            _logger = logger;
             _blogRepository = blogRepository;
             _mediaManager = mediaManager;
             _mapper = mapper;
@@ -58,10 +61,16 @@ namespace TatBlog.WebApp.Areas.Admin.Controllers
         }
         public async Task<IActionResult> Index(PostFilterModel model)
         {
+            _logger.LogInformation("Tạo điều kiện truy vấn");
+
             var postQuery = _mapper.Map<PostQuery>(model);
+
+            _logger.LogInformation("Lấy danh sách bài viết từ CSDL");
 
             ViewBag.PostsList = await _blogRepository
                 .GetPagedPostsAsync(postQuery, 1, 10);
+
+            _logger.LogInformation("Chuẩn bị dữ liệu cho ViewModel");
 
             await PopulatePostFilterModelAsync(model);
 
@@ -139,20 +148,6 @@ namespace TatBlog.WebApp.Areas.Admin.Controllers
             return slugExisted
                 ? Json($"Slug '{urlSlug}' đã được sử dụng")
                 : Json(true);
-        }
-        public async Task<IActionResult> Index(
-            [FromQuery(Name = "k")] string keyword = "",
-            [FromQuery(Name = "p")] int pageNumber = 1,
-            [FromQuery(Name = "ps")] int pageSize = 10)
-        {
-            var postQuery = new PostQuery()
-            {
-                PublishedOnly = true,
-                KeyWord = keyword
-            };
-            var postsList = await _blogRepository.GetPagedPostsAsync(postQuery, pageNumber, pageSize);
-            ViewBag.PostQuery = postQuery;
-            return View(postsList);
         }
     }
 }
