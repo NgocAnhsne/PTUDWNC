@@ -15,4 +15,8 @@
     <ProjectReference Include="..\TatBlog.Data\TatBlog.Data.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Timing\" />
+  </ItemGroup>
+
 </Project>
