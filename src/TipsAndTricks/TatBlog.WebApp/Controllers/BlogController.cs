@@ -24,6 +24,20 @@ namespace TatBlog.WebApp.Controllers
             ViewBag.PostQuery = postQuery;
             return View(postsList);
         }
+        //public async Task<IActionResult> Category(
+        //                    string slug = null)
+        //{
+        //    if (slug == null) return NotFound();
+
+        //    var postQuery = new PostQuery
+        //    {
+        //        CategorySlug = slug
+        //    };
+
+        //    var posts = await _blogRepository.GetPostAsync();
+
+        //    return View(posts);
+        //}
         public IActionResult About() => View();
         public IActionResult Contact() => View();
         public IActionResult Rss() => Content("Nội dung sẽ được cập nhật");

@@ -23,6 +23,7 @@ namespace TatBlog.Services.Blogs
         public async Task<Post> GetPostAsync(
             int year,
             int month,
+            int day,
             string slug,
             CancellationToken cancellationToken = default)
         {
@@ -37,6 +38,10 @@ namespace TatBlog.Services.Blogs
             if (month > 0)
             {
                 postsQuery = postsQuery.Where(x => x.PostedDate.Month == month);
+            }
+            if (day > 0)
+            {
+                postsQuery = postsQuery.Where(x => x.PostedDate.Day == day);
             }
             if (!string.IsNullOrEmpty(slug))
             {
@@ -115,25 +120,6 @@ namespace TatBlog.Services.Blogs
                     PostCount = x.Posts.Count(p => p.Published)
                 })
                 .ToListAsync(cancellationToken);
-        }
-        public async Task<IList<AuthorItem>> GetAuthorItemsAsync(
-            CancellationToken cancellationToken = default)
-        {
-            IQueryable<Author> author = _context.Set<Author>();
-            return await author
-            .OrderBy(x => x.FullName)
-            .Select(x => new AuthorItem()
-            {
-                Id = x.Id,
-                FullName = x.FullName,
-                UrlSlug = x.UrlSlug,
-                Email = x.Email,
-                ImageUrl = x.ImageUrl,
-                JoinedDate = x.JoinedDate,
-                Notes = x.Notes,
-                PostCount = x.Posts.Count(p => p.Published)
-            }).ToListAsync(cancellationToken);
-
         }
         public async Task<IPagedList<TagItem>> GetPagedTagAsync(
             IPagingParams pagingParams,
