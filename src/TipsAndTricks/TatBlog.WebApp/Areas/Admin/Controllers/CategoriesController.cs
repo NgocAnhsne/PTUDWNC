@@ -25,7 +25,7 @@ namespace TatBlog.WebApp.Areas.Admin.Controllers
             _mediaManager = mediaManager;
             _mapper = mapper;
         }
-        [HttpGet]
+        //[HttpGet]
         //public async Task<IActionResult> Index(
         //CategoryFilterModel model,
         //[FromQuery(Name = "p")] int pageNumber = 1,
