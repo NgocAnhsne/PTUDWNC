@@ -47,8 +47,20 @@ namespace TatBlog.Services.Blogs
         int pageNumber = 1,
         int pageSize = 10,
         CancellationToken cancellationToken = default);
+        Task<IPagedList<CategoryItem>> GetPagedCategoriesAsync(
+        IPagingParams pagingParams,
+        CancellationToken cancellationToken = default);
+        Task<IPagedList<T>> GetPagedCategoriesAsync<T>(
+        CategoryQuery query,
+        int pageNumber,
+        int pageSize,
+        Func<IQueryable<Category>, IQueryable<T>> mapper,
+        string sortColumn = "Id",
+        string sortOrder = "ASC",
+        CancellationToken cancellationToken = default);
         Task<Post> CreateOrUpdatePostAsync(
         Post post, IEnumerable<string> tags,
         CancellationToken cancellationToken = default);
+
     }
 }

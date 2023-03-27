@@ -59,6 +59,7 @@ namespace TatBlog.WebApp.Areas.Admin.Controllers
                 Value = c.Id.ToString()
             });
         }
+        [HttpGet]
         public async Task<IActionResult> Index(PostFilterModel model)
         {
             _logger.LogInformation("Tạo điều kiện truy vấn");
@@ -68,7 +69,7 @@ namespace TatBlog.WebApp.Areas.Admin.Controllers
             _logger.LogInformation("Lấy danh sách bài viết từ CSDL");
 
             ViewBag.PostsList = await _blogRepository
-                .GetPagedPostsAsync(postQuery, 1, 10);
+                .GetPagedPostsAsync(postQuery, 1, 5);
 
             _logger.LogInformation("Chuẩn bị dữ liệu cho ViewModel");
 

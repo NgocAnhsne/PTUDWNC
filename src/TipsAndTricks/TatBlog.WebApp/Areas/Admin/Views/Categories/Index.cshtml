@@ -1,8 +1,83 @@
-﻿
+﻿@using TatBlog.Core.Constracts
+@using TatBlog.Core.Entities
+@model TatBlog.WebApp.Areas.Admin.Models.CategoryFilterModel
 @{
-    ViewData["PageTitle"] = "Bảng điều khiển";
+    ViewData["PageTitle"] = "Danh sách bài viết";
+    var categories = ViewBag.Items as IPagedList<CategoryItem>;
 }
 
 <h1>
-    Đây là khu vực dành cho người quản trị
+    Danh sách chủ đề
 </h1>
+
+<partial name="_CategoryFilterPane" model="Model" />
+@if (categories != null && categories.Count > 0)
+{
+    <table class="table table-responsive table-striped">
+        <thead>
+            <tr>
+                <th>Tên chủ đề</th>
+                <th>Mô tả</th>
+                <th>Số bài viết</th>
+                <th>Hiển thị</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var category in categories)
+            {
+                <tr>
+                    <td>
+                        <a asp-area="Admin"
+                   asp-controller="Categories"
+                   asp-action="Edit"
+                   asp-route-id="@category.Id"
+                           class="text-bold">
+                            @category.Name
+                        </a>
+                    </td>
+                    <td>
+                        @category.Description
+                    </td>
+                    <td>
+                        @category.PostCount
+                    </td>
+                    <td>
+                        <a asp-area="Admin"
+                   asp-controller="Categories"
+                   asp-action="ToggleShowOnMenu"
+                   asp-route-id="@category.Id"
+                   asp-route-p="@categories.PageNumber"
+                   asp-route-ps="@categories.PageSize"
+                           class="btn btn-info change-status-post">
+                            @if (category.ShowOnMenu)
+                            {
+                                <span>Ẩn</span>
+                            }
+                            else
+                            {
+                                <span>Hiện</span>
+                            }
+                        </a>
+                    </td>
+                    <td>
+                        <a asp-area="Admin"
+                   asp-controller="Categories"
+                   asp-action="Delete"
+                   asp-route-id="@category.Id"
+                   asp-route-p="@categories.PageNumber"
+                   asp-route-ps="@categories.PageSize"
+                           class="btn btn-danger change-status-post align-content-start"
+                           onclick="return confirm('Bạn có chắc chắn muốn xóa bài viết này không??')">
+                            Xóa
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+} else
+{
+<h1 class="text-danger">
+    Không tìm thấy bài viết nào
+</h1>
+}
