@@ -7,6 +7,7 @@ using TatBlog.Core.Entities;
 using TatBlog.Services.Blogs;
 using TatBlog.Services.Media;
 using TatBlog.WebApp.Areas.Admin.Models;
+using TatBlog.WebApp.Validations;
 
 namespace TatBlog.WebApp.Areas.Admin.Controllers
 {
@@ -16,6 +17,8 @@ namespace TatBlog.WebApp.Areas.Admin.Controllers
         private readonly IBlogRepository _blogRepository;
         private readonly IMediaManager _mediaManager;
         private readonly IMapper _mapper;
+        // Ađd thêm IValidation để kiểm tra đầu vào dử liệu
+        private readonly IValidator<PostEditModel> _postValidator;
 
         public PostsController(ILogger<PostsController> logger, 
             IBlogRepository blogRepository,
@@ -26,6 +29,8 @@ namespace TatBlog.WebApp.Areas.Admin.Controllers
             _blogRepository = blogRepository;
             _mediaManager = mediaManager;
             _mapper = mapper;
+            // Khởi tạo validator to post *** LƯU Ý PHẢI KHỞI TẠO OBJECT VÌ BÊN CLASS KIA LÀ REQUIRED :D
+            _postValidator = new PostValidator(blogRepository);
         }
         private async Task PopulatePostFilterModelAsync(PostFilterModel model)
         {
@@ -93,10 +98,10 @@ namespace TatBlog.WebApp.Areas.Admin.Controllers
 
         [HttpPost]
         public async Task<IActionResult> Edit(
-            IValidator<PostEditModel> postValidator,
             PostEditModel model)
         {
-            var validationResult = await postValidator.ValidateAsync(model);
+
+            var validationResult = await _postValidator.ValidateAsync(model);
             if (!validationResult.IsValid)
             {
                 validationResult.AddToModelState(ModelState);
