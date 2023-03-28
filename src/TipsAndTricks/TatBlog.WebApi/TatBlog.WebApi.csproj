@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
-    <Nullable>enable</Nullable>
+    <Nullable>disable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
@@ -36,7 +36,6 @@
     <Folder Include="Filters\" />
     <Folder Include="Mapsters\" />
     <Folder Include="uploads\pictures\" />
-    <Folder Include="Validations\" />
   </ItemGroup>
 
 </Project>
