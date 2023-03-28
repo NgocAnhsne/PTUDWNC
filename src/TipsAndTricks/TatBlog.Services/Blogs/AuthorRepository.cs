@@ -154,4 +154,16 @@ public class AuthorRepository : IAuthorRepository
 				x.SetProperty(a => a.ImageUrl, a => imageUrl), 
 				cancellationToken) > 0;
 	}
+    public async Task<IList<Author>> GetPopularAuthorAsync(
+        int numAuths, CancellationToken cancellationToken = default)
+    {
+        return await _context.Set<Author>()
+            .Include(x => x.FullName)
+            .Include(x => x.Posts)
+            .Include(x => x.JoinedDate)
+            .Include(p => p.UrlSlug)
+            .Include(x => x.Notes)
+            .Take(numAuths)
+            .ToListAsync(cancellationToken);
+    }
 }
