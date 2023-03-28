@@ -10,6 +10,7 @@ using TatBlog.Data.Contexts;
 using TatBlog.Core.Constracts;
 using TatBlog.Services.Extentions;
 using TatBlog.Services.Extensions;
+using System.Linq.Dynamic.Core;
 
 namespace TatBlog.Services.Blogs
 {
@@ -229,7 +230,6 @@ namespace TatBlog.Services.Blogs
                 nameof(Post.PostedDate), "DESC",
                 cancellationToken);
         }
-
         public async Task<IPagedList<T>> GetPagedPostsAsync<T>(
             PostQuery condition,
             IPagingParams pagingParams,
@@ -239,6 +239,59 @@ namespace TatBlog.Services.Blogs
             var projectedPosts = mapper(posts);
 
             return await projectedPosts.ToPagedListAsync(pagingParams);
+        }
+        public async Task<IPagedList<CategoryItem>> GetPagedCategoriesAsync(
+        IPagingParams pagingParams,
+        CancellationToken cancellationToken = default)
+        {
+            IQueryable<CategoryItem> categoriesQuery = _context.Set<Category>()
+              .Select(c => new CategoryItem()
+              {
+                  Id = c.Id,
+                  Description = c.Description,
+                  Name = c.Name,
+                  ShowOnMenu = c.ShowOnMenu,
+                  UrlSlug = c.UrlSlug,
+                  PostCount = c.Posts.Count(p => p.Published),
+              });
+
+            return await categoriesQuery
+              .ToPagedListAsync(pagingParams, cancellationToken);
+        }
+        public IQueryable<Category> FilterCategories(
+        CategoryQuery condition)
+        {
+            IQueryable<Category> categories = _context.Set<Category>()
+                .Include(x => x.Posts);
+            categories.ToList();
+
+            if (!string.IsNullOrWhiteSpace(condition.KeyWord))
+            {
+                categories = categories.Where(x => x.Name.Contains(condition.KeyWord));
+            }
+
+            if (condition.NotShowOnMenu)
+            {
+                categories = categories.Where(x => !x.ShowOnMenu);
+            }
+
+            return categories;
+        }
+        public async Task<IPagedList<T>> GetPagedCategoriesAsync<T>(
+        CategoryQuery query,
+        int pageNumber,
+        int pageSize,
+        Func<IQueryable<Category>, IQueryable<T>> mapper,
+        string sortColumn = "Id",
+        string sortOrder = "ASC",
+        CancellationToken cancellationToken = default)
+        {
+            IQueryable<Category> categoryFilter = FilterCategories(query);
+
+            IQueryable<T> resultQuery = mapper(categoryFilter);
+
+            return await resultQuery
+              .ToPagedListAsync<T>(pageNumber, pageSize, sortColumn, sortOrder, cancellationToken);
         }
         public async Task<Post> CreateOrUpdatePostAsync(
         Post post, IEnumerable<string> tags,

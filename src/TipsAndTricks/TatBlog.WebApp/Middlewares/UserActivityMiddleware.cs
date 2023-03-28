@@ -21,7 +21,7 @@
                 context.Connection.RemoteIpAddress?.ToString(),
                 context.Request.Path);
 
-            await _next(context);
+                await _next(context);
         }
     }
 }

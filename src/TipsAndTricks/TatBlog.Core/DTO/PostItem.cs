@@ -24,6 +24,6 @@ namespace TatBlog.Core.DTO
         public int AuthorId { get; set; }
         public string CategoryName { get; set; }
         public string AuthorName { get; set; }
-        public IList<String> Tags { get; set; }
+        public string Tags { get; set; }
     }
 }

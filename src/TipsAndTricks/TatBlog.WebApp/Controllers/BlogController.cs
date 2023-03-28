@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TatBlog.Core.Constracts;
 using TatBlog.Services.Blogs;
 
 namespace TatBlog.WebApp.Controllers
@@ -24,6 +25,33 @@ namespace TatBlog.WebApp.Controllers
             ViewBag.PostQuery = postQuery;
             return View(postsList);
         }
+        //public async Task<IActionResult> Category(
+        //    string slug,
+        //    [FromQuery(Name = "p")] int pageNumber = 1,
+        //    [FromQuery(Name = "ps")] int pageSize = 5)
+        //{
+
+        //    var category = await _blogRepository
+        //      .GetCategoryItemsAsync(slug);
+        //    var postQuery = new PostQuery()
+        //    {
+        //        PublishedOnly = true,
+        //        CategorySlug = slug,
+        //        CategoryName = category.Name
+        //    };
+
+
+
+        //    IPagingParams pagingParams = CreatePagingParamsPost(pageNumber, pageSize);
+        //    var posts = await _blogRepository
+        //      .GetPagedPostsAsync(postQuery, pagingParams);
+
+
+        //    ViewBag.PostQuery = postQuery;
+        //    ViewBag.Title = $"Chủ đề {postQuery.CategoryName}";
+
+        //    return View("Index", posts);
+        //}
         public IActionResult About() => View();
         public IActionResult Contact() => View();
         public IActionResult Rss() => Content("Nội dung sẽ được cập nhật");
