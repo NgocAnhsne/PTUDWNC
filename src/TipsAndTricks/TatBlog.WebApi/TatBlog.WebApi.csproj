@@ -32,10 +32,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Endpoints\" />
     <Folder Include="Filters\" />
     <Folder Include="Mapsters\" />
-    <Folder Include="uploads\pictures\" />
+    <Folder Include="wwwroot\" />
+    <Folder Include="wwwroot\uploads\pictures\" />
   </ItemGroup>
 
 </Project>
