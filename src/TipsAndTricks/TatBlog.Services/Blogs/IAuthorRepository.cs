@@ -46,4 +46,6 @@ public interface IAuthorRepository
 	Task<bool> SetImageUrlAsync(
 		int authorId, string imageUrl,
 		CancellationToken cancellationToken = default);
+	Task<IList<Author>> GetPopularAuthorAsync(
+		int numAuths, CancellationToken cancellationToken = default);
 }
