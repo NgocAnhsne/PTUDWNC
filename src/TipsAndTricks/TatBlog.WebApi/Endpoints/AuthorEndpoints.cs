@@ -84,20 +84,23 @@ namespace TatBlog.WebApi.Endpoints
                 $"Không tìm thấy tác giả có mã số {id}"))
                 : Results.Ok(ApiResponse.Success(mapper.Map<AuthorItem>(author)));
         }
-        private static async Task<IResult> GetPostsByAuthor(
+        private static async Task<IResult> GetPostByAuthorId(
             int id,
             [AsParameters] PagingModel pagingModel,
             IBlogRepository blogRepository)
         {
-            var postQuery = new PostQuery()
+            var postQuery = new PostQuery
             {
                 AuthorId = id,
                 PublishedOnly = true
             };
+
             var postsList = await blogRepository.GetPagedPostsAsync(
                 postQuery, pagingModel,
                 posts => posts.ProjectToType<PostDto>());
+
             var paginationResult = new PaginationResult<PostDto>(postsList);
+
             return Results.Ok(ApiResponse.Success(paginationResult));
         }
         private static async Task<IResult> GetPostsByAuthorSlug(

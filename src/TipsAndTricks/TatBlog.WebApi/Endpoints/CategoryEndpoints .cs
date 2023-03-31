@@ -111,7 +111,7 @@ namespace TatBlog.WebApi.Endpoints
 
             var paginationResult = new PaginationResult<PostDto>(postsList);
 
-            return Results.Ok(paginationResult);
+            return Results.Ok(ApiResponse.Success(paginationResult));
         }
         private static async Task<IResult> AddCategory(
             CategoryEditModel model, 
@@ -127,7 +127,7 @@ namespace TatBlog.WebApi.Endpoints
             }
 
             var category = mapper.Map<Category>(model);
-            await categoryRepository.AddOrUpdateAsync(category);
+            await categoryRepository.AddOrUpdateCategoryAsync(category);
 
             return Results.CreatedAtRoute(
                 "GetCategoryById", new { category.Id }, 
@@ -147,7 +147,7 @@ namespace TatBlog.WebApi.Endpoints
             var category = mapper.Map<Category>(model);
             category.Id = id;
 
-            return await categoryRepository.AddOrUpdateAsync(category) 
+            return await categoryRepository.AddOrUpdateCategoryAsync(category) 
                 ? Results.NoContent() 
                 : Results.NotFound();
         }

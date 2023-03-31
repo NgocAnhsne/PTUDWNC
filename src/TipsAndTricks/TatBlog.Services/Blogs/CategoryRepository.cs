@@ -100,7 +100,7 @@ namespace TatBlog.Services.Blogs
             return await mapper(categoryQuery)
                 .ToPagedListAsync(pagingParams, cancellationToken);
         }
-        public async Task<bool> AddOrUpdateAsync(
+        public async Task<bool> AddOrUpdateCategoryAsync(
             Category category,
             CancellationToken cancellationToken = default)
         {
@@ -132,12 +132,12 @@ namespace TatBlog.Services.Blogs
             .AnyAsync(x => x.Id != categoryId && x.UrlSlug == slug, cancellationToken);
         }
         public async Task<IList<Category>> GetPopularCategoryAsync(
-            int numAuths, CancellationToken cancellationToken = default)
+            int numCate, CancellationToken cancellationToken = default)
         {
             return await _context.Set<Category>()
             .Include(x => x.Name)
             .Include(p => p.UrlSlug)
-            .Take(numAuths)
+            .Take(numCate)
             .ToListAsync(cancellationToken);
         }
     }
