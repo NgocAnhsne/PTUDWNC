@@ -9,46 +9,45 @@ using TatBlog.Core.Entities;
 
 namespace TatBlog.Services.Blogs
 {
-    public interface ICategoryRepository
+    public interface ITagRepository
     {
-        Task<Category> GetCategoryBySlugAsync(
+        Task<Tag> GetTagBySlugAsync(
         string slug,
         CancellationToken cancellationToken = default);
 
-        Task<Category> GetCachedCategoryBySlugAsync(
+        Task<Tag> GetCachedTagBySlugAsync(
             string slug, CancellationToken cancellationToken = default);
 
-        Task<Category> GetCategoryByIdAsync(int categoryId);
+        Task<Tag> GetTagByIdAsync(int tag);
 
-        Task<Category> GetCachedCategoryByIdAsync(int categoryId);
+        Task<Tag> GetCachedTagByIdAsync(int tagId);
 
-        Task<IList<CategoryItem>> GetCategoriesAsync(
+        Task<IList<TagItem>> GetTagsAsync(
             CancellationToken cancellationToken = default);
 
-        Task<IPagedList<CategoryItem>> GetPagedCategoriesAsync(
+        Task<IPagedList<TagItem>> GetPagedTagsAsync(
             IPagingParams pagingParams,
             string name = null,
             CancellationToken cancellationToken = default);
 
-        Task<IPagedList<T>> GetPagedCategoriesAsync<T>(
-            Func<IQueryable<Category>, IQueryable<T>> mapper,
+        Task<IPagedList<T>> GetPagedTagsAsync<T>(
+            Func<IQueryable<Tag>, IQueryable<T>> mapper,
             IPagingParams pagingParams,
             string name = null,
             CancellationToken cancellationToken = default);
 
-        Task<bool> AddOrUpdateCategoryAsync(
-            Category category,
+        Task<bool> AddOrUpdateTagAsync(
+            Tag tag,
             CancellationToken cancellationToken = default);
 
-        Task<bool> DeleteCategoryAsync(
-            int categoryId,
+        Task<bool> DeleteTagAsync(
+            int TagId,
             CancellationToken cancellationToken = default);
 
-        Task<bool> IsCategorySlugExistedAsync(
-            int categoryId, string slug,
+        Task<bool> IsTagSlugExistedAsync(
+            int TagId, string slug,
             CancellationToken cancellationToken = default);
-
-        Task<IList<Category>> GetPopularCategoryAsync(
-            int numCate, CancellationToken cancellationToken = default);
+        Task<IList<Tag>> GetPopularTagAsync(
+            int numTags, CancellationToken cancellationToken = default);
     }
 }

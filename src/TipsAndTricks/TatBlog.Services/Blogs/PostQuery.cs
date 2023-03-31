@@ -10,6 +10,7 @@ namespace TatBlog.Services.Blogs
     {
         public int ?AuthorId { get; set; }
         public int ?CategoryId { get; set; }
+        public int ? TagId { get; set; }
         public string ?CategorySlug { get; set; }
         public string ?TitleSlug { get; set; }
         public string ?TagSlug { get; set; }
