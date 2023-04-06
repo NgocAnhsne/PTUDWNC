@@ -16,59 +16,55 @@ namespace TatBlog.WebApi.Endpoints
 {
     public static class AuthorEndpoints
     {
-        public static WebApplication MapAuthorEndpoints(
-            this WebApplication app)
+        public static WebApplication MapAuthorEndpoints(this WebApplication app)
         {
             var routeGroupBuilder = app.MapGroup("/api/authors");
 
             routeGroupBuilder.MapGet("/", GetAuthors)
-                         .WithName("GetAuthors")
-                         .Produces<ApiResponse<PaginationResult<AuthorItem>>>();
+                .WithName("GetAuthors")
+                .Produces<ApiResponse<PaginationResult<AuthorItem>>>();
 
             routeGroupBuilder.MapGet("/{id:int}", GetAuthorDetails)
-                         .WithName("GetAuthorById")
-                         .Produces<ApiResponse<AuthorItem>>();
+                .WithName("GetAuthorById")
+                .Produces<ApiResponse<AuthorItem>>();
 
-            routeGroupBuilder.MapGet("/{slug::regex(^[a-z0-9_-]+$)}/posts", GetPostsByAuthorSlug)
-                         .WithName("GetPostByAuthorSlug")
-                         .Produces<ApiResponse<PaginationResult<PostDto>>>();
+            routeGroupBuilder.MapGet("/{slug:regex(^[a-z0-9_-]+$)}/posts",
+           GetPostsByAuthor)
+                .WithName("GetPostsByAuthorSlug")
+                .Produces<ApiResponse<PaginationResult<PostDto>>>();
 
             routeGroupBuilder.MapPost("/", AddAuthor)
-                         .WithName("AddNewAuthor")
-                         .AddEndpointFilter<ValidatorFilter<AuthorEditModel>>()
-                         .RequireAuthorization()
-                         .Produces(401)
-                         .Produces<ApiResponse<AuthorItem>>();
+                .AddEndpointFilter<ValidatorFilter<AuthorEditModel>>()
+                .WithName("AddNewAuthor")
+                .Produces(401)
+                .Produces<ApiResponse<AuthorItem>>();
 
-            routeGroupBuilder.MapPost("/{id:int}/avatar", SetAuthorPicture)
-                         .WithName("SetAuthorPicture")
-                         .RequireAuthorization()
-                         .Accepts<IFormFile>("multipart/formdata")
-                         .Produces(401)
-                         .Produces<ApiResponse<string>>();
+            routeGroupBuilder.MapPost("/{id:int}/picture", SetAuthorPicture)
+                .WithName("SetAuthorPicture")
+                .Accepts<IFormFile>("multipart/form-data")
+                .Produces(401)
+                .Produces<ApiResponse<string>>();
 
             routeGroupBuilder.MapPut("/{id:int}", UpdateAuthor)
-                         .WithName("UpdateAuthor")
-                         .RequireAuthorization()
-                         .Produces(401)
-                         .Produces<ApiResponse<string>>();
-            ;
+                .WithName("UpdateAnAuthor")
+                .Produces(401)
+                .Produces<ApiResponse<string>>();
 
             routeGroupBuilder.MapDelete("/{id:int}", DeleteAuthor)
-                             .WithName("DeleteAuthor")
-                             .RequireAuthorization()
-                             .Produces(401)
-                             .Produces<ApiResponse<string>>();
+                .WithName("DeleteAnAuthor")
+                .Produces(401)
+                .Produces<ApiResponse<string>>();
+
             return app;
         }
         private static async Task<IResult> GetAuthors(
             [AsParameters] AuthorFilterModel model,
             IAuthorRepository authorRepository)
         {
-            var authorList = await authorRepository.GetPagedAuthorsAsync(model, model.Name);
-
-            var paginationResult = new PaginationResult<AuthorItem>(authorList);
-
+            var authorsList = await authorRepository.GetPagedAuthorsAsync(model,
+           model.Name);
+            var paginationResult = new
+           PaginationResult<AuthorItem>(authorsList);
             return Results.Ok(ApiResponse.Success(paginationResult));
         }
         private static async Task<IResult> GetAuthorDetails(
@@ -76,50 +72,27 @@ namespace TatBlog.WebApi.Endpoints
             IAuthorRepository authorRepository,
             IMapper mapper)
         {
-            var author = await authorRepository.
-                GetCachedAuthorByIdAsync(id);
-
+            var author = await authorRepository.GetCachedAuthorByIdAsync(id);
             return author == null
-                ? Results.Ok(ApiResponse.Fail(HttpStatusCode.NotFound,
-                $"Không tìm thấy tác giả có mã số {id}"))
-                : Results.Ok(ApiResponse.Success(mapper.Map<AuthorItem>(author)));
+            ? Results.Ok(ApiResponse.Fail(HttpStatusCode.NotFound, $"Không tìm thấy tác giả có mã số {id}"))
+            : Results.Ok(ApiResponse.Success(mapper.Map<AuthorItem>(author)));
         }
-        private static async Task<IResult> GetPostByAuthorId(
+        private static async Task<IResult> GetPostsByAuthor(
             int id,
-            [AsParameters] PagingModel pagingModel,
-            IBlogRepository blogRepository)
-        {
-            var postQuery = new PostQuery
-            {
-                AuthorId = id,
-                PublishedOnly = true
-            };
-
-            var postsList = await blogRepository.GetPagedPostsAsync(
-                postQuery, pagingModel,
-                posts => posts.ProjectToType<PostDto>());
-
-            var paginationResult = new PaginationResult<PostDto>(postsList);
-
-            return Results.Ok(ApiResponse.Success(paginationResult));
-        }
-        private static async Task<IResult> GetPostsByAuthorSlug(
-            [FromRoute] string slug,
             [AsParameters] PagingModel pagingModel,
             IBlogRepository blogRepository)
         {
             var postQuery = new PostQuery()
             {
-                AuthorSlug = slug,
+                AuthorId = id,
                 PublishedOnly = true
             };
             var postsList = await blogRepository.GetPagedPostsAsync(
-                postQuery, pagingModel,
-                posts => posts.ProjectToType<PostDto>());
+            postQuery, pagingModel,
+            posts => posts.ProjectToType<PostDto>());
             var paginationResult = new PaginationResult<PostDto>(postsList);
             return Results.Ok(ApiResponse.Success(paginationResult));
         }
-
         private static async Task<IResult> AddAuthor(
             AuthorEditModel model,
             IAuthorRepository authorRepository,
@@ -129,8 +102,7 @@ namespace TatBlog.WebApi.Endpoints
            model.UrlSlug))
             {
                 return Results.Ok(ApiResponse.Fail(
-                HttpStatusCode.Conflict, 
-                $"Slug '{model.UrlSlug}' đã được sử dụng"));
+                HttpStatusCode.Conflict, $"Slug '{model.UrlSlug}' đã được sử dụng"));
             }
             var author = mapper.Map<Author>(model);
             await authorRepository.AddOrUpdateAsync(author);
@@ -138,14 +110,15 @@ namespace TatBlog.WebApi.Endpoints
             mapper.Map<AuthorItem>(author), HttpStatusCode.Created));
         }
         private static async Task<IResult> SetAuthorPicture(
-            int id, IFormFile imageFile,
+            int id,
+            IFormFile imageFile,
             IAuthorRepository authorRepository,
             IMediaManager mediaManager)
         {
             var imageUrl = await mediaManager.SaveFileAsync(
-                imageFile.OpenReadStream(),
-                imageFile.FileName,
-                imageFile.ContentType);
+            imageFile.OpenReadStream(),
+            imageFile.FileName,
+            imageFile.ContentType);
             if (string.IsNullOrWhiteSpace(imageUrl))
             {
                 return Results.Ok(ApiResponse.Fail(
@@ -155,9 +128,11 @@ namespace TatBlog.WebApi.Endpoints
             return Results.Ok(ApiResponse.Success(imageUrl));
         }
         private static async Task<IResult> UpdateAuthor(
-            int id, AuthorEditModel model,
+            int id,
+            AuthorEditModel model,
             IValidator<AuthorEditModel> validator,
-            IAuthorRepository authorRepository, IMapper mapper)
+            IAuthorRepository authorRepository,
+            IMapper mapper)
         {
             var validationResult = await validator.ValidateAsync(model);
             if (!validationResult.IsValid)
@@ -173,38 +148,19 @@ namespace TatBlog.WebApi.Endpoints
                 $"Slug '{model.UrlSlug}' đã được sử dụng"));
             }
             var author = mapper.Map<Author>(model);
-                author.Id = id;
-
+            author.Id = id;
             return await authorRepository.AddOrUpdateAsync(author)
-                ? Results.Ok(ApiResponse.Success("Author is updated",
-                HttpStatusCode.NoContent))
-                : Results.Ok(ApiResponse.Fail(HttpStatusCode.NotFound, 
-                "Could not find author"));
+            ? Results.Ok(ApiResponse.Success("Author is updated",
+           HttpStatusCode.NoContent))
+            : Results.Ok(ApiResponse.Fail(HttpStatusCode.NotFound, "Could not find author"));
         }
-        private static async Task<IResult> DeleteAuthor(
-            int id,
-            IAuthorRepository authorRepository)
+        private static async Task<IResult> DeleteAuthor(int id,
+       IAuthorRepository authorRepository)
         {
             return await authorRepository.DeleteAuthorAsync(id)
-                ? Results.Ok(ApiResponse.Success("Author is deleted",
-                HttpStatusCode.NoContent))
-                : Results.Ok(ApiResponse.Fail(HttpStatusCode.NotFound, 
-                "Could not find author"));
+            ? Results.Ok(ApiResponse.Success("Author is deleted",
+           HttpStatusCode.NoContent))
+            : Results.Ok(ApiResponse.Fail(HttpStatusCode.NotFound, "Could not find author"));
         }
-        //Van dung
-        //private static async Task<IResult> GetPopularAuthor(
-        //    [FromRoute] string slug,
-        //    [AsParameters] PagingModel pagingModel,
-        //    IAuthorRepository authorRepository)
-        //{
-        //    var query = new PostQuery
-        //    {
-        //        AuthorSlug = slug,
-        //    };
-
-        //    var authList = await authorRepository.GetPopularAuthorAsync(2);
-
-        //    return Results.Ok(authList);
-        //}
     }
 }
