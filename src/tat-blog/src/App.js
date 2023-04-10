@@ -7,13 +7,17 @@ import Index from './Pages/Index';
 import About from './Pages/About';
 import Contact from './Pages/Contact';
 import RSS from './Pages/RSS';
+//admin
 import AdminLayout from './Pages/Admin/Layout';
 import * as AdminIndex from './Pages/Admin/Index';
-import Authors from './Pages/Admin/Authors' 
-import Categories from './Pages/Admin/Categories' 
-import Comments from './Pages/Admin/Comments' 
-import Posts from './Pages/Admin/Post/Posts' 
-import Tags from './Pages/Admin/Tags' 
+import Authors from './Pages/Admin/Authors'; 
+import Categories from './Pages/Admin/Categories'; 
+import Comments from './Pages/Admin/Comments'; 
+import Posts from './Pages/Admin/Post/Posts'; 
+import Tags from './Pages/Admin/Tags';
+
+import NotFound from './Pages/NotFound';
+import BadRequest from './Pages/BadRequest';
 import {
   BrowserRouter as Router,
   Routes,
@@ -23,30 +27,6 @@ import {
 
 function App() {
   return (
-    // <div>
-    //   <Router>
-    //     <Navbar/>
-    //     <div className='container-fluid'>
-    //       <div className='row'>
-    //         <div className='col-9'>
-    //         <Routes>
-    //           <Route path='/' element={<Layout />}>
-    //             <Route path='/' element={<Index />} />
-    //             <Route path='blog' element={<Index />} />
-    //             <Route path='blog/Contact' element={<Contact />} />
-    //             <Route path='blog/About' element={<About />} />
-    //             <Route path='blog/RSS' element={<RSS />} />
-    //           </Route>
-    //         </Routes>
-    //         </div>
-    //         <div className='col-3 border-start'>
-    //           <Sidebar />
-    //         </div>
-    //       </div>
-    //     </div>
-    //     <Footer />
-    //   </Router>
-    // </div>
     <Router>
       <Routes>
         <Route path='/' element={<Layout />}>
@@ -64,6 +44,8 @@ function App() {
           <Route path='/admin/posts' element={<Posts />} />
           <Route path='/admin/tags' element={<Tags />} />
         </Route>
+        <Route path='/400' element={<BadRequest />} />
+        <Route path='*' element={<NotFound />} />
       </Routes>
       <Footer />
     </Router>
