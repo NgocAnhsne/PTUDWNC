@@ -27,7 +27,7 @@ namespace TatBlog.WebApi.Validations
             .MaximumLength(1000)
             .WithMessage("Meta dài tối đa 1000");
 
-            RuleFor(p => p.ShortDescription)
+            RuleFor(p => p.ImageUrl)
             .NotEmpty()
             .WithMessage("Slug bài viết không được để trống")
             .MaximumLength(1000)

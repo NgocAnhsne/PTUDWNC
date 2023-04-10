@@ -1,6 +1,4 @@
 import './App.css';
-import Navbar from './Components/Navbar';
-import Sidebar from './Components/Sidebar';
 import Footer from './Components/Footer';
 import Layout from './Pages/Layout';
 import Index from './Pages/Index';

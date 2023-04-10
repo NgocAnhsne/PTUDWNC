@@ -20,7 +20,7 @@ namespace TatBlog.WebApi.Endpoints
 
             routeGroupBuilder.MapGet("/", GetPosts)
                          .WithName("GetPosts")
-                         .Produces<PaginationResult<PostItem>>();
+                         .Produces<ApiResponse<PaginationResult<PostItem>>>();
 
             routeGroupBuilder.MapGet("/get-posts-filter", GetFilteredPosts)
             .WithName("GetFilteredPost")
