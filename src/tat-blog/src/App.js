@@ -13,6 +13,7 @@ import Categories from './Pages/Admin/Categories';
 import Comments from './Pages/Admin/Comments'; 
 import Posts from './Pages/Admin/Post/Posts'; 
 import Tags from './Pages/Admin/Tags';
+import Edit from './Pages/Admin/Post/Edit';
 
 import NotFound from './Pages/NotFound';
 import BadRequest from './Pages/BadRequest';
@@ -40,6 +41,8 @@ function App() {
           <Route path='/admin/categories' element={<Categories />} />
           <Route path='/admin/comments' element={<Comments />} />
           <Route path='/admin/posts' element={<Posts />} />
+          <Route path='/admin/posts/edit' element={<Edit />} />
+          <Route path='/admin/posts/edit/:id' element={<Edit />}/>
           <Route path='/admin/tags' element={<Tags />} />
         </Route>
         <Route path='/400' element={<BadRequest />} />
