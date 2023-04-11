@@ -3,6 +3,7 @@ using MapsterMapper;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Net;
 using TatBlog.Core.Collections;
+using TatBlog.Core.Constracts;
 using TatBlog.Core.DTO;
 using TatBlog.Core.Entities;
 using TatBlog.Services.Blogs;
@@ -45,7 +46,7 @@ namespace TatBlog.WebApi.Endpoints
             IMapper mapper)
         {
             var postQuery = mapper.Map<PostQuery>(model);
-            var postList = await blogRepository.GetPostByQueryAsync(postQuery, model, post => post.ProjectToType<PostItem>());
+            var postList = await blogRepository.GetPostByQueryAsync(postQuery, (IPagingParams)model, post => post.ProjectToType<PostItem>());
 
             var paginationResult = new PaginationResult<PostItem>(postList);
 

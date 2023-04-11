@@ -4,7 +4,7 @@ using System.Globalization;
 
 namespace TatBlog.WebApi.Models
 {
-    public class PostFilterModel: PagingModel
+    public class PostFilterModel
     {
         [DisplayName("Từ khóa")]
         public string Keyword { get; set; }
