@@ -14,6 +14,7 @@ namespace TatBlog.Services.Blogs
         public string ?CategorySlug { get; set; }
         public string ?TitleSlug { get; set; }
         public string ?TagSlug { get; set; }
+        public string ?PostSlug { get; set; }
         public string ?AuthorSlug { get; set; }
         public int ?Month { get; set; }
         public int ?Year { get; set; }

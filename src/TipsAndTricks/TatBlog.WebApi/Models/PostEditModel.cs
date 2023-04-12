@@ -10,6 +10,9 @@ namespace TatBlog.WebApi.Models
         [DisplayName("Tiêu đề")]
         [Required(ErrorMessage = "Tiêu đề không được để trống")]
         [MaxLength(500, ErrorMessage = "Tiêu đề tối đa 500 ký tự")]
+        public string UrlSlug { get; set; }
+        [DisplayName("UrlSlug")]
+        [Required]
         public string Title { get; set; }
         [DisplayName("Giới thiệu")]
         [Required]
@@ -52,6 +55,7 @@ namespace TatBlog.WebApi.Models
             {
                 ImageFile = form.Files["ImageFile"],
                 Id = int.Parse(form["Id"]),
+                UrlSlug = form["Slug"],
                 Title = form["Title"],
                 ShortDescription = form["ShortDescription"],
                 Description = form["Description"],

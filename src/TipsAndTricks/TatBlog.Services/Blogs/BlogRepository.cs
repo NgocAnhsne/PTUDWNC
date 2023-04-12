@@ -11,15 +11,18 @@ using TatBlog.Core.Constracts;
 using TatBlog.Services.Extentions;
 using TatBlog.Services.Extensions;
 using System.Linq.Dynamic.Core;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace TatBlog.Services.Blogs
 {
     public class BlogRepository : IBlogRepository
     {
         private readonly BlogDbContext _context;
-        public BlogRepository(BlogDbContext context)
+        private readonly IMemoryCache _memoryCache;
+        public BlogRepository(BlogDbContext context, IMemoryCache memoryCache)
         {
             _context = context;
+            _memoryCache = memoryCache;
         }
         public async Task<Post> GetPostAsync(
             int year,
@@ -350,14 +353,7 @@ namespace TatBlog.Services.Blogs
                                     cancellationToken);
         }
 
-        public async Task<IPagedList<Post>> GetPostByQueryAsync(
-            PostQuery query, IPagingParams pagingParams, 
-            CancellationToken cancellationToken = default)
-        {
-            return await FilterPosts(query).ToPagedListAsync(
-                                            pagingParams,
-                                            cancellationToken);
-        }
+        
 
         public async Task<IPagedList<T>> GetPostByQueryAsync<T>(
             PostQuery query, 
@@ -368,6 +364,31 @@ namespace TatBlog.Services.Blogs
             IQueryable<T> result = mapper(FilterPosts(query));
 
             return await result.ToPagedListAsync(pagingParams, cancellationToken);
+        }
+
+        public async Task<Post> GetCachedPostByIdAsync(
+            int id, bool published = false, 
+            CancellationToken cancellationToken = default)
+        {
+            return await _memoryCache.GetOrCreateAsync(
+                $"post.by-id.{id}-{published}",
+                async (entry) =>
+                {
+                    entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(30);
+                    return await GetPostByIdAsync(id, published, cancellationToken);
+                });
+        }
+        public async Task<bool> DeletePostByIdAsync(
+            int id, CancellationToken cancellationToken = default)
+        {
+            var post = await _context.Set<Post>().FindAsync(id);
+
+            if (post is null) return false;
+
+            _context.Set<Post>().Remove(post);
+            var rowsCount = await _context.SaveChangesAsync(cancellationToken);
+
+            return rowsCount > 0;
         }
     }
 }
