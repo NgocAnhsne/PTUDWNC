@@ -11,6 +11,7 @@ import {
 } from "../../../Services/BlogRepository";
 
 const Edit = () => {
+  const [validated, setValidated] = useState(false);
   const initialState = {
       id: 0,
       title: "",
@@ -58,19 +59,17 @@ const Edit = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (e.currentTarget.checkValidity() === false) {
-    e.stopPropagation();
-    setValidated(true);
+      e.stopPropagation();
+      setValidated(true);
     } else {
-    let form = new FormData(e.target);
-    form.append('published', post.published);
-    addOrUpdatePost(form).then(data => {
-    if (data)
-    alert('Đã lưu thành công!');
-    else
-    alert('Đã xảy ra lỗi!');
-    });
+      let form = new FormData(e.target);
+      form.append("published", post.published);
+      addOrUpdatePost(form).then((data) => {
+        if (data) alert("Đã lưu thành công!");
+        else alert("Đã xảy ra lỗi!");
+      });
     }
-   }
+  };
   if (id && !isInteger(id))
     return <Navigate to={`/400?redirectTo=/admin/posts`} />;
   return (
@@ -99,6 +98,9 @@ const Edit = () => {
                 })
               }
             />
+            <Form.Control.Feedback type="invalid">
+              Không được bỏ trống.
+            </Form.Control.Feedback>
           </div>
         </div>
         <div className="row mb-3">
@@ -125,7 +127,8 @@ const Edit = () => {
           <div className="col-sm-10">
             <Form.Control
               as="textarea"
-              type="text required"
+              type="text"
+              required
               name="shortDescription"
               title="Short description"
               value={decode(post.shortDescription || "")}
@@ -136,6 +139,9 @@ const Edit = () => {
                 })
               }
             />
+            <Form.Control.Feedback type="invalid">
+              Không được bỏ trống.
+            </Form.Control.Feedback>
           </div>
         </div>
         <div className="row mb-3">
@@ -156,6 +162,9 @@ const Edit = () => {
                 })
               }
             />
+            <Form.Control.Feedback type="invalid">
+              Không được bỏ trống.
+            </Form.Control.Feedback>
           </div>
         </div>
         <div className="row mb-3">
@@ -174,6 +183,9 @@ const Edit = () => {
                 })
               }
             />
+            <Form.Control.Feedback type="invalid">
+              Không được bỏ trống.
+            </Form.Control.Feedback>
           </div>
         </div>
         <div className="row mb-3">
@@ -199,6 +211,9 @@ const Edit = () => {
                   </option>
                 ))}
             </Form.Select>
+            <Form.Control.Feedback type="invalid">
+              Không được bỏ trống.
+            </Form.Control.Feedback>
           </div>
         </div>
         <div className="row mb-3">
@@ -224,6 +239,9 @@ const Edit = () => {
                   </option>
                 ))}
             </Form.Select>
+            <Form.Control.Feedback type="invalid">
+              Không được bỏ trống.
+            </Form.Control.Feedback>
           </div>
         </div>
         <div className="row mb-3">
@@ -246,6 +264,9 @@ const Edit = () => {
                 })
               }
             ></Form.Control>
+            <Form.Control.Feedback type="invalid">
+              Không được bỏ trống.
+            </Form.Control.Feedback>
           </div>
         </div>
         {!isEmptyOrSpaces(post.imageUrl) && (
@@ -309,6 +330,5 @@ const Edit = () => {
     </>
   );
 };
-const [validated, setValidated] = useState(false);
 
 export default Edit;
