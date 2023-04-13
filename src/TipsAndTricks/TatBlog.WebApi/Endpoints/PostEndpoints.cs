@@ -1,4 +1,5 @@
-﻿using Mapster;
+﻿using FluentValidation;
+using Mapster;
 using MapsterMapper;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Net;
@@ -9,6 +10,7 @@ using TatBlog.Core.Entities;
 using TatBlog.Services.Blogs;
 using TatBlog.Services.Extensions;
 using TatBlog.Services.Media;
+using TatBlog.WebApi.Filters;
 using TatBlog.WebApi.Models;
 
 namespace TatBlog.WebApi.Endpoints
@@ -21,7 +23,7 @@ namespace TatBlog.WebApi.Endpoints
 
             routeGroupBuilder.MapGet("/", GetPosts)
                          .WithName("GetPosts")
-                         .Produces<ApiResponse<PaginationResult<PostItem>>>();
+                         .Produces<ApiResponse<PaginationResult<PostDto>>>();
 
             routeGroupBuilder.MapGet("/get-posts-filter", GetFilteredPosts)
             .WithName("GetFilteredPost")
@@ -37,20 +39,47 @@ namespace TatBlog.WebApi.Endpoints
             .Produces(401)
             .Produces<ApiResponse<PostItem>>();
 
+            routeGroupBuilder.MapGet("/{id:int}", GetPostDetails)
+                 .WithName("GetPostById")
+                 .Produces<ApiResponse<PostDto>>();
+
+            routeGroupBuilder.MapGet("/byslug/{slug::regex(^[a-z0-9_-]+$)}", GetPostBySlug)
+                 .WithName("GetPostBySlug")
+                 .Produces<ApiResponse<PostDto>>();
+
+            routeGroupBuilder.MapDelete("/{id:int}", DeletePost)
+                .WithName("DeletePost")
+                .Produces(401)
+                .Produces<ApiResponse<string>>();
+
+            routeGroupBuilder.MapPut("/{id:int}", UpdatePost)
+                .WithName("UpdateAPost")
+                .AddEndpointFilter<ValidatorFilter<PostEditModel>>()
+                .Produces(401)
+                .Produces<ApiResponse<string>>();
+
+            routeGroupBuilder.MapPost("/{id:int}/picture", SetPostPicture)
+                 .WithName("SetPostPicture")
+                 .Accepts<IFormFile>("multipart/formdata")
+                 .Produces(401)
+                 .Produces<string>();
+
             return app;
 
         }
         private static async Task<IResult> GetPosts(
-            [AsParameters] PostFilterModel model, 
-            IBlogRepository blogRepository, 
+            [AsParameters] PostFilterModel model,
+            PagingModel pagingModel,
+            IBlogRepository blogRepository,
             IMapper mapper)
         {
             var postQuery = mapper.Map<PostQuery>(model);
-            var postList = await blogRepository.GetPostByQueryAsync(postQuery, (IPagingParams)model, post => post.ProjectToType<PostItem>());
+            var postList = await blogRepository.GetPostByQueryAsync<PostDto>(
+                postQuery, pagingModel, posts => posts.ProjectToType<PostDto>());
 
-            var paginationResult = new PaginationResult<PostItem>(postList);
+            var paginationResult = new PaginationResult<PostDto>(postList);
 
-            return Results.Ok(paginationResult);
+            return Results.Ok(ApiResponse.Success(paginationResult));
         }
         private static async Task<IResult> GetFilter(
             IAuthorRepository authorRepository,
@@ -60,7 +89,7 @@ namespace TatBlog.WebApi.Endpoints
             {
                 AuthorList = (await authorRepository.GetAuthorsAsync())
                 .Select(a => new SelectListItem()
-                { 
+                {
                     Text = a.FullName,
                     Value = a.Id.ToString()
                 }),
@@ -141,6 +170,87 @@ namespace TatBlog.WebApi.Endpoints
            model.GetSelectedTags());
             return Results.Ok(ApiResponse.Success(
             mapper.Map<PostItem>(post), HttpStatusCode.Created));
+        }
+        private static async Task<IResult> GetPostDetails(int id, IBlogRepository blogRepository, IMapper mapper)
+        {
+            var post = await blogRepository.GetCachedPostByIdAsync(id);
+
+            return post == null ?
+                Results.Ok(ApiResponse.Fail(HttpStatusCode.NotFound,
+                $"Không tìm thấy bài viết có mã số {id}"))
+                : Results.Ok(ApiResponse.Success(mapper.Map<PostDto>(post)));
+        }
+        private static async Task<IResult> GetPostBySlug(string slug, [AsParameters] PagingModel pagingModel, IBlogRepository blogRepository)
+        {
+            var postQuery = new PostQuery
+            {
+                PostSlug = slug,
+                PublishedOnly = true
+            };
+
+            var postsList = await blogRepository.GetPostByQueryAsync(
+                postQuery, pagingModel,
+                posts => posts.ProjectToType<PostDto>());
+
+            var post = postsList.FirstOrDefault();
+
+            return Results.Ok(ApiResponse.Success(post));
+        }
+        private static async Task<IResult> DeletePost(
+            int id, IBlogRepository blogRepository)
+        {
+            return await blogRepository.DeletePostByIdAsync(id)
+                ? Results.Ok(ApiResponse.Success("Post is deleted",
+                HttpStatusCode.NoContent))
+                : Results.Ok(ApiResponse.Fail(HttpStatusCode.NotFound,
+                $"Could not find post with id = {id}"));
+        }
+        private static async Task<IResult> UpdatePost(
+            int id, PostEditModel model,
+            IBlogRepository blogRepository, IMapper mapper)
+        {
+            if (await blogRepository.IsPostSlugExistedAsync(id, model.UrlSlug))
+            {
+                return Results.Ok(ApiResponse.Fail(
+                    HttpStatusCode.Conflict, 
+                    $"Slug '{model.UrlSlug}' đã được sử dụng"));
+
+            }
+
+            var post = await blogRepository.GetPostByIdAsync(id);
+            mapper.Map(model, post);
+            post.Id = id;
+            post.ModifiedDate = DateTime.Now;
+
+            return await blogRepository.CreateOrUpdatePostAsync(post, model.GetSelectedTags()) != null
+                ? Results.Ok(ApiResponse.Success("Post is updated", HttpStatusCode.NoContent))
+                : Results.Ok(ApiResponse.Fail(HttpStatusCode.NotFound, "Could not find post"));
+        }
+        private static async Task<IResult> SetPostPicture(
+            int id, IFormFile imageFile,
+            IBlogRepository blogRepository, IMediaManager mediaManager)
+        {
+            var post = await blogRepository.GetCachedPostByIdAsync(id);
+            string newImagePath = string.Empty;
+
+            if (imageFile?.Length > 0)
+            {
+                newImagePath = await mediaManager.SaveFileAsync(
+                    imageFile.OpenReadStream(), imageFile.FileName,
+                    imageFile.ContentType);
+
+                if (string.IsNullOrWhiteSpace(newImagePath))
+                {
+                    return Results.Ok(ApiResponse.Fail(
+                        HttpStatusCode.BadRequest,
+                        "Không lưu được tập tin"));
+                }
+
+                await mediaManager.DeleteFileAsync(post.ImageUrl);
+                post.ImageUrl = newImagePath;
+            }
+
+            return Results.Ok(ApiResponse.Success(newImagePath));
         }
     }
 }

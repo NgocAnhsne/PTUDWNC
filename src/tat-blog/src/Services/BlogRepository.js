@@ -11,11 +11,9 @@ export async function getPosts (keyword = '',
 } 
 export function getAuthors(name = '',
  pageSize = 10,
- pageNumber = 1,
- sortColumn = '',
- sortOrder = '') {
+ pageNumber = 1,) {
  return
-    get_api(`https://localhost:7085/api/authors?name=${name}&PageSize=${pageSize}&PageNumber=${pageNumber}&SortColumn=${sortColumn}&SortOrder=${sortOrder}`);
+    get_api(`https://localhost:7154/api/authors?PageSize=${pageSize}&PageNumber=${pageNumber}`);
 }
 export function getFilter() {
     return get_api('https://localhost:7085/api/posts/get-filter');
@@ -37,7 +35,7 @@ sortOrder = '') {
 }
 export async function getPostById(id = 0) {
     if (id > 0)
- return get_api(`https://localhost:7085/api/posts/${id}`);
+ return get_api(`https://localhost:7154/api/posts/${id}`);
  return null;
 }
 export function addOrUpdatePost(formData){
